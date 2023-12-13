@@ -2,22 +2,10 @@ import math
 import cv2
 import mediapipe as mp
 
-
 class HandDetector:
-    """
-    Finds Hands using the mediapipe library. Exports the landmarks
-    in pixel format.
-    """
+
 
     def __init__(self, staticMode=False, maxHands=2, modelComplexity=1, detectionCon=0.5, minTrackCon=0.5):
-
-        """
-        :param mode: In static mode, detection is done on each image: slower
-        :param maxHands: Maximum number of hands to detect
-        :param modelComplexity: Complexity of the hand landmark model: 0 or 1.
-        :param detectionCon: Minimum Detection Confidence Threshold
-        :param minTrackCon: Minimum Tracking Confidence Threshold
-        """
         self.staticMode = staticMode
         self.maxHands = maxHands
         self.modelComplexity = modelComplexity
@@ -34,12 +22,6 @@ class HandDetector:
         self.lmList = []
 
     def findHands(self, img, draw=True,handConnection=True, flipType=True):
-        """
-        Finds hands in a BGR image.
-        :param img: Image to find the hands in.
-        :param draw: Flag to draw the output on the image.
-        :return: Image with or without drawings
-        """
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         allHands = []
