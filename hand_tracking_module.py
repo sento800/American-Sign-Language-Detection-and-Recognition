@@ -2,10 +2,18 @@ import math
 import cv2
 import mediapipe as mp
 
+
 class HandDetector:
 
-
     def __init__(self, staticMode=False, maxHands=2, modelComplexity=1, detectionCon=0.5, minTrackCon=0.5):
+
+        """
+        :param mode: Ở chế độ tĩnh, việc phát hiện được thực hiện trên mỗi hình ảnh: chậm hơn
+        :param maxHands: Số lượng bàn tay tối đa để phát hiện 
+        :param modelĐộ phức tạp: Độ phức tạp của mô hình mốc bàn tay: 0 hoặc 1. 
+        :param detectCon: Ngưỡng tin cậy phát hiện tối thiểu 
+        :param minTrackCon: Ngưỡng tin cậy theo dõi tối thiểu
+        """
         self.staticMode = staticMode
         self.maxHands = maxHands
         self.modelComplexity = modelComplexity
@@ -21,7 +29,12 @@ class HandDetector:
         self.mpDraw = mp.solutions.drawing_utils
         self.lmList = []
 
-    def findHands(self, img, draw=True,handConnection=True, flipType=True):
+    def findHands(self, img,handConnection=True, flipType=True):
+        """
+        Tìm bàn tay trong hình ảnh BGR. 
+        :param img: Hình ảnh để tìm bàn tay.  
+        :return: Hình ảnh có hoặc không có hình vẽ
+        """
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         allHands = []
@@ -63,13 +76,5 @@ class HandDetector:
                 if handConnection:
                     self.mpDraw.draw_landmarks(img, handLms,
                                                self.mpHands.HAND_CONNECTIONS)
-
-                ## draw
-                if draw:
-                    cv2.rectangle(img, (bbox[0] - 20, bbox[1] - 20),
-                                  (bbox[0] + bbox[2] + 20, bbox[1] + bbox[3] + 20),
-                                  (255, 0, 255), 2)
-                    cv2.putText(img, myHand["type"], (bbox[0] - 30, bbox[1] - 30), cv2.FONT_HERSHEY_PLAIN,
-                                2, (255, 0, 255), 2)
 
         return allHands, img

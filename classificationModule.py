@@ -2,44 +2,51 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import Model,load_model
 from tensorflow.keras.applications import mobilenet
-from keras.models import load_model
+from keras.models import load_model  # TensorFlow is required for Keras to work
 from PIL import Image, ImageOps
 
 
 class Classifier:
-
+    """
+    Classifier class that handles image classification using a pre-trained Keras model.
+    """
 
     def __init__(self, modelPath, labelsPath=None):
+        """
+        Khởi tạo Trình phân loại với mô hình và nhãn.
+
+        :param modelPath: str, đường dẫn đến mô hình Keras 
+        :param labelsPath: str, đường dẫn đến tệp nhãn (tùy chọn)
+        """
         self.model_path = modelPath
         np.set_printoptions(suppress=True) 
 
+        # Tải mô hình Keras
         self.model = load_model(self.model_path)
 
-
+        # Tạo một mảng NumPy có hình dạng phù hợp để đưa vào mô hình Keras
         self.data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 
-        self.labels_path = labelsPath
-
-        if self.labels_path:
-            label_file = open(self.labels_path, "r")
-            self.list_labels = [line.strip() for line in label_file]
-            label_file.close()
-        else:
-            print("No Labels Found")
-
     def getPrediction(self, img, draw=True, pos=(50, 50), scale=2, color=(0, 255, 0)):
+        """
+        Phân loại hình ảnh và tùy ý vẽ kết quả lên hình ảnh. 
 
+        :param img: hình ảnh để phân loại 
+        :param draw: có vẽ dự đoán trên hình ảnh hay không 
+        :param pos: vị trí nơi vẽ văn bản 
+        :param tỉ lệ: tỷ lệ phông chữ 
+        :param color: màu văn bản 
+        :return: danh sách dự đoán, chỉ mục của dự đoán có khả năng nhất
+        """
+        # Resize and normalize ảnh
         imgS = cv2.resize(img, (224, 224))
         image=np.expand_dims(imgS,axis=0)
         image_mobilenet=mobilenet.preprocess_input(image)
 
-
         self.data[0] = image_mobilenet
 
+        # Run inference
         prediction = self.model.predict(self.data)
         indexVal = np.argmax(prediction)
-
-        if draw and self.labels_path:
-            cv2.putText(img, str(self.list_labels[indexVal]), pos, cv2.FONT_HERSHEY_COMPLEX, scale, color, 2)
 
         return list(prediction[0]), indexVal
